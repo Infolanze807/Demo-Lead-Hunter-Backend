@@ -81,7 +81,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: 'https://demo-lead-hunter-frontend.vercel.app/',
+  origin: 'https://demo-lead-hunter-frontend.vercel.app',
   credentials: true
 }));
 
