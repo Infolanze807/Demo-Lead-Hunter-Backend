@@ -258,7 +258,7 @@ exports.getSearchByTag = async (req, res) => {
 exports.getTechnology = async (req, res) => {
     try {
         // Get the technology from the query parameter or the request body and convert to lowercase
-        const technology = (req.query.Technology || req.body.Technology || '').toLowerCase();
+        const technology = (req.query.Technology).toLowerCase();
 
         if (!technology) {
             return res.status(400).json({ message: "Technology parameter is required" });

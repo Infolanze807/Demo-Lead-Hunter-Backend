@@ -19,7 +19,7 @@ const leadDataSchema = new Schema({
 //     const createdAt = this.createdAt;
 
 //     const diffInMs = now - createdAt;
-//     const diffInDays = Math.floor(diffInMs / (1000 *  60 * 60 * 24));
+//     const diffInDays = Math.floor(diffInMs / (1000   60  60 * 24));
 
 //     if (diffInDays === 0) {
 //         return 'Today';
@@ -39,7 +39,7 @@ leadDataSchema.virtual('formattedCreatedAt').get(function() {
     createdAt.setHours(0, 0, 0, 0);
 
     const diffInMs = now - createdAt;
-    const diffInDays = Math.floor(diffInMs / (1000 *  60 * 60 * 24));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
     if (diffInDays === 0) {
         return 'Today';

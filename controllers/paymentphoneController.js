@@ -15,21 +15,19 @@ function generateTransactionID() {
 
 async function newPayment(req, res) {
   try {
-    const { name, phonenumber, password, role, email, amount } = req.body;
-
+    const { name, phonenumber,password,email, amount } = req.body;
+    
     const data = {
       merchantId: "PGTESTPAYUAT",
       merchantTransactionId: generateTransactionID(),
       merchantUserId: "MUID2QWQEFW5Q6WSER7",
       name: name,
       amount: amount * 100, // Convert amount to cents
-      redirectUrl: "https://lead-backend.vercel.app/api/phonepe/status/",
+      redirectUrl: "http://localhost:3001/api/phonepe/status/",
       // redirectUrl: "process.env.BASE_URL/api/phonepe/status/",
       redirectMode: "POST",
       email: email,
-      role: role,
       mobileNumber: phonenumber,
-      password: password, // Ensure password security
       paymentInstrument: {
         type: "PAY_PAGE",
       },
@@ -60,50 +58,58 @@ async function newPayment(req, res) {
     axios
       .request(options)
       .then(async function (response) {
-        console.log(response.data,"hghgfjc");
-
         try {
-          const user_found = await User.findOne({
-            $or: [{ email }, { phonenumber }],
-          });
-
+          const user_found = await User.findOne({ email });
           if (user_found) {
             if (user_found.payment_status === "SUCCESSFUL") {
-                return res.json({ exist: "Account already exists" });
-            } else if (user_found.payment_status === "PENDING" && user_found.email === email && user_found.phonenumber !== phonenumber) {
-                return res.json({ exist: "Account already exists" });
-            } else if (user_found.payment_status === "PENDING" && user_found.email !== email && user_found.phonenumber !== phonenumber) {
-                return res.json({ exist: "Account already exists" });
-            } else if (user_found.payment_status === "PENDING") {
+                return res.json({ status:false,msg: "Account already exists" });
+            }
+            else if (user_found.payment_status === "PENDING") {
                 try {
+                
                 const hashedPassword = await bcrypt.hash(password, 10);
                 // Update transaction ID and payment status
                 user_found.transaction_id = response.data.data.merchantTransactionId;
                 user_found.password = hashedPassword;
                 user_found.amount = amount;
-                // user_found.phonenumber = phonenumber;
-                // user_found.email = email;
+                user_found.phonenumber = phonenumber;
                 user_found.name = name;
                 await user_found.save();
-                console.log(response.data.data.instrumentResponse.redirectInfo.url)
+             
                 // Redirect to payment page
-                return res.status(200).send(response.data.data.instrumentResponse.redirectInfo.url);
+                return res.status(200).json({
+                  url:response.data.data.instrumentResponse.redirectInfo.url,
+                  status:true,
+                  user_found
+                }
+                  );
               } catch (error) {
                 console.error("Error updating user:", error);
                 res.status(500).json({ error: "Internal server error" });
               }
             }
             
-          } else {
-            const new_user = {
-              ...req.body,
+          } 
+          else {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = new User({
               transaction_id: response.data.data.merchantTransactionId,
-            };
-            createNewUser(new_user);
-            return res.json(
-              response.data.data.instrumentResponse.redirectInfo.url
-            );
-          }
+              name: name,
+              email:email,
+              phonenumber: phonenumber,
+
+              password: hashedPassword, // Assign hashed password to user object
+              amount:amount,
+            });
+            // Save the new user to the database
+            await newUser.save();
+  
+            return res.status(201).json({
+              url:response.data.data.instrumentResponse.redirectInfo.url,
+              status:true,
+              newUser
+            })
+           }
         } catch (error) {
           console.log("Error querying user:", error);
           res.status(500).json({ error: "Internal server error" });
@@ -151,6 +157,7 @@ async function statusCheck(req, res) {
   axios
     .request(options)
     .then(async (response) => {
+  
       if (response.data.success === true) {
         const transaction_id = response.data.data.merchantTransactionId;
         const req_data = await User.findOne({ transaction_id });

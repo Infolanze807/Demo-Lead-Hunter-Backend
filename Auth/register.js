@@ -139,15 +139,15 @@ async function createNewUser(req, res) {
     const user = req.body;
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(user.password, 10);
+    //const hashedPassword = await bcrypt.hash(user.password, 10);
 
     const newUser = new User({
-      // transaction_id: user.transaction_id,
+      transaction_id: user.transaction_id,
       name: user.name,
       email: user.email,
       phonenumber: user.phonenumber,
       role: user.role,
-      password: hashedPassword, // Assign hashed password to user object
+      //password: hashedPassword, // Assign hashed password to user object
       amount: user.amount,
     });
     // Save the new user to the database

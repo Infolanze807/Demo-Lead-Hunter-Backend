@@ -34,7 +34,7 @@ async function login(req, res) {
     const result = await bcrypt.compare(password, user.password);
 
     if (!result) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return res.status(400).json({ user:false,message: "Incorrect password" });
     }
 
     // Check payment status
@@ -64,56 +64,7 @@ async function login(req, res) {
         token: token
       });
     } else if (user.payment_status === "PENDING") {
-      // Construct payment data
-      const data = {
-        merchantId: "PGTESTPAYUAT",
-        merchantTransactionId: user.transaction_id,
-        merchantUserId: "MUID2QWQEFW5Q6WSER7",
-        amount: user.amount * 100, // Convert amount to cents
-        redirectUrl: "https://lead-backend.vercel.app/api/phonepe/status/",
-        // redirectUrl: "process.env.BASE_URL/api/phonepe/status/",
-        redirectMode: "POST",
-        email: user.email,
-        password: user.password, // Ensure password security
-        paymentInstrument: {
-          type: "PAY_PAGE",
-        },
-      };
-
-      // Convert data to payload and calculate checksum
-      const payload = JSON.stringify(data);
-      const payloadMain = Buffer.from(payload).toString("base64");
-      const keyIndex = 1;
-      const string =
-        payloadMain + "/pg/v1/pay" + "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-      const sha256 = crypto.createHash("sha256").update(string).digest("hex");
-      const checksum = sha256 + "###" + keyIndex;
-
-      // Set URL and options for payment request
-      const URL =
-        "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
-      const options = {
-        method: "POST",
-        url: URL,
-        headers: {
-          accept: "application/json",
-          "Content-Type": "application/json",
-          "X-VERIFY": checksum,
-        },
-        data: {
-          request: payloadMain,
-        },
-      };
-
-      // Make payment request
-      const response = await axios(options);
-
-      // Return payment page URL
-      return res.status(200).json({
-        user:true,
-        payment_status: user.payment_status,
-        payment_link: response.data.data.instrumentResponse.redirectInfo.url
-    });
+        return res.json({payment_status:"PENDING",message:"PLEASE SIGN UP AGAIN AND COMPLETE PAYMENT"})
     } else {
       // Handle other payment statuses
       return res.status(400).json({ message: "Login not successful" });
@@ -124,61 +75,6 @@ async function login(req, res) {
   }
 }
 
-async function statusCheck(req, res) {
-  try {
-    const { transactionId, merchantId } = req.body;
 
-    // Construct URL for status check
-    const url = `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${merchantId}/${transactionId}`;
 
-    // Calculate checksum
-    const keyIndex = 1;
-    const string = url + "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-    const sha256 = crypto.createHash("sha256").update(string).digest("hex");
-    const checksum = sha256 + "###" + keyIndex;
-
-    // Set headers
-    const headers = {
-      accept: "application/json",
-      "Content-Type": "application/json",
-      "X-VERIFY": checksum,
-      "X-MERCHANT-ID": merchantId,
-    };
-
-    // Make request to check status
-    const response = await axios.get(url, { headers });
-
-    // Handle response based on payment status
-    if (response.data.success === true) {
-      const transactionId = response.data.data.merchantTransactionId;
-
-      // Find user by transactionId
-      const user = await User.findOne({ transaction_id: transactionId });
-
-      if (user) {
-        // Update payment status to SUCCESSFUL
-        user.payment_status = "SUCCESSFUL";
-        await user.save();
-
-        // Redirect to pay-success page
-        // const redirectUrl = `https://lead-hunter-olive.vercel.app/pay-success/${transactionId}`;
-        const redirectUrl = `${process.env.BASE_URL}/pay-success/${transactionId}`;
-        return res.redirect(redirectUrl);
-      } else {
-        // User not found
-        // return res.redirect("https://lead-hunter-olive.vercel.app/register?status=failed");
-        return res.redirect(`${process.env.BASE_URL}/register?status=failed`);
-      }
-    } else {
-      // Payment status not successful
-      // return res.redirect("https://lead-hunter-olive.vercel.app/register?status=failed");
-      return res.redirect(`${process.env.BASE_URL}/register?status=failed`);
-    }
-  } catch (error) {
-    console.error("An error occurred:", error);
-    // return res.redirect("https://lead-hunter-olive.vercel.app/register?status=failed");
-    return res.redirect(`${process.env.BASE_URL}/register?status=failed`);
-  }
-};
-
-module.exports = { login, statusCheck };
+module.exports = { login };

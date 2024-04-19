@@ -17,7 +17,7 @@ const UserSchema = new Mongoose.Schema({
   password: {
     type: String,
     minlength: 6,
-    required: [true,"Password is required"]
+    //required: [true,"Password is required"]
   },
   amount: {
     type: Number,
@@ -25,7 +25,7 @@ const UserSchema = new Mongoose.Schema({
   },
   phonenumber: {
     type: String,
-    unique: true,
+   // unique: true,
     minlength: 10,
     maxlength: 10,
     // Regular expression for Indian phone number validation
@@ -37,14 +37,14 @@ const UserSchema = new Mongoose.Schema({
     default: "Basic",
     required: true,
   },
-  // transaction_id: {
-  //   type : String,
-  //   required : [true, "id not provided"]
-  // },
+  transaction_id: {
+    type : String,
+    //required : [true, "id not provided"]
+  },
   payment_status: {
     type : String,
     enum : ['PENDING','SUCCESSFUL','FAILED'],
-    default : "SUCCESSFUL"
+    default : "PENDING"
   }
 },{timestamps : true})
 
