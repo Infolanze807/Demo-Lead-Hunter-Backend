@@ -15,7 +15,7 @@
 
     const app = express(); // Initialize express app here
 
-    app.use(cors( { origin:'https://www.leadhunter.co.in', credentials:true })); // Now you can use cors middleware after initializing app
+    app.use(cors( { origin:`${process.env.BASE_URL}`, credentials:true })); // Now you can use cors middleware after initializing app
 
     connectDB();
 
@@ -27,7 +27,6 @@
 
 app.get("/logout", (req, res) => {
     res.cookie("jwt", "", { maxAge: "0" });
-    // res.redirect("/");
     res.status(200).json({ message: 'Logged out successfully' });
 });
 
@@ -54,7 +53,7 @@ app.get("/logout", (req, res) => {
         res.status(200).json({ key: process.env.KEY_ID })
     );
 
-    const PORT = process.env.PORT || 9002;
+    const PORT = process.env.PORT || 5000;
     const server = app.listen(PORT, () => console.log(`Server connected to port ${PORT}`));
 
     process.on("unhandledRejection", err => {

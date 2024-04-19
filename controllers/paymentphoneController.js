@@ -23,8 +23,7 @@ async function newPayment(req, res) {
       merchantUserId: "MUID2QWQEFW5Q6WSER7",
       name: name,
       amount: amount * 100, // Convert amount to cents
-      redirectUrl: "http://localhost:3001/api/phonepe/status/",
-      // redirectUrl: "process.env.BASE_URL/api/phonepe/status/",
+      redirectUrl: `${process.env.BASE_URL}/api/phonepe/status/`,
       redirectMode: "POST",
       email: email,
       mobileNumber: phonenumber,
@@ -97,7 +96,6 @@ async function newPayment(req, res) {
               name: name,
               email:email,
               phonenumber: phonenumber,
-
               password: hashedPassword, // Assign hashed password to user object
               amount:amount,
             });

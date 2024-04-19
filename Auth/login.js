@@ -64,7 +64,7 @@ async function login(req, res) {
         token: token
       });
     } else if (user.payment_status === "PENDING") {
-        return res.json({payment_status:"PENDING",message:"PLEASE SIGN UP AGAIN AND COMPLETE PAYMENT"})
+        return res.json({payment_status:"PENDING", message:"PLEASE SIGN UP AGAIN AND COMPLETE PAYMENT"})
     } else {
       // Handle other payment statuses
       return res.status(400).json({ message: "Login not successful" });

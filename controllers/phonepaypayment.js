@@ -19,7 +19,7 @@ const newPayment = async (req, res) => {
  merchantUserId: 'MUID2QWQEFW5Q6WSER7',
  name: name,
  amount: price * 100,
- redirectUrl: `http://localhost:3001/api/phonepe/status/${merchantTransactionId}`,
+ redirectUrl: `${process.env.BASE_URL}/api/phonepe/status/${merchantTransactionId}`,
  redirectMode: 'POST',
  mobileNumber: phone,
  paymentInstrument: {
