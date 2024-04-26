@@ -68,7 +68,7 @@ exports.getLeadsByTag = async (req, res) => {
         const leads = await LeadData.find({ tags: { $regex: new RegExp(selectedtags.join('|'), 'i') } });
 
         if (leads.length === 0) {
-            return res.status(404).json({ message: `No leads found for the tag(s) "${selectedtags.join(', ')}"` });
+            return res.status(404).json({ message: `No leads found for the tag(s) "${selectedtags.join(', ')}"` }).sort({ createdAt: -1});
         }
 
         res.status(200).json(leads);
@@ -98,7 +98,7 @@ exports.getLeadsByPlatform = async (req, res) => {
         }
 
         // Find leads that contain the specified platforms
-        const leads = await LeadData.find({ platforms: { $in: selectedPlatforms } });
+        const leads = await LeadData.find({ platforms: { $in: selectedPlatforms } }).sort({ createdAt: -1});
 
         if (leads.length === 0) {
             return res.status(404).json({ message: "No leads found for the specified platform(s)" });
@@ -191,7 +191,7 @@ exports.getSearchByTag = async (req, res) => {
         const regex = new RegExp(regexPattern, 'i');
 
         // Find leads that contain any tag matching the regex pattern
-        const leads = await LeadData.find({ tags: { $regex: regex } });
+        const leads = await LeadData.find({ tags: { $regex: regex } }).sort({ createdAt: -1});
         console.log(leads)
         if (leads.length === 0) {
             return res.status(404).json({ message: `No leads found for the provided tag(s)` });
@@ -274,7 +274,7 @@ exports.getTechnology = async (req, res) => {
         }
 
         // Find leads matching any of the specified technologies (case-insensitive)
-        const leads = await LeadData.find({ Technology: new RegExp(technology, 'i') });
+        const leads = await LeadData.find({ Technology: new RegExp(technology, 'i') }).sort({ createdAt: -1});
 
         if (leads.length === 0) {
             return res.status(404).json({ message: `No leads found for the provided technology` });
