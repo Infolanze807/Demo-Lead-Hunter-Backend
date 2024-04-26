@@ -44,27 +44,27 @@ router.get('/technology', leadController.getTechnology);
 router.post('/remotelead', leadController.createRemoteLead);
 
 // GET /leads - Get all leads
-router.get('/remote', leadController.getAllRemoteLeads);
+router.get('/remotelead', leadController.getAllRemoteLeads);
 
 // DELETE /leads/:id - Delete a lead by ID
-router.delete('/:remoteid', leadController.deleteRemoteLeadById);
+router.delete('/remotelead/:id', leadController.deleteRemoteLeadById);
 // router.delete("/:id", adminAuth, leadController.deleteLeadById);
 
 // Route to fetch leads by tag
-router.get('/tag', leadController.getRemoteLeadsByTag);
+router.get('/remotelead/tag', leadController.getRemoteLeadsByTag);
 
 // Route to search leads by tag
-router.get('/search', leadController.getSearchByTag);
+router.get('/remotelead/search', leadController.getRemoteleadSearchByTag);
 
 // GET /leads/platform - Get leads by platform
-router.get("/platform", leadController.getRemoteLeadsByPlatform);
+router.get("/remotelead/platform", leadController.getRemoteLeadsByPlatform);
 
 // Define route for getting leads by platform and tag
 // router.get("/platformtag", leadController.getLeadsByPlatformAndTag); // Get leads by platform and tag
-router.get('/remoteleads/search', leadController.getRemoteLeadsByPlatformAndTag);
+router.get('/remotelead/search', leadController.getRemoteLeadsByPlatformAndTag);
 
 
-router.get('/technology', leadController.getTechnology);
+// router.get('/technology', leadController.getRemoteleadTechnology);
 
 // ... //
 

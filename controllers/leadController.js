@@ -335,11 +335,11 @@ exports.deleteRemoteLeadById = async (req, res) => {
 exports.getRemoteLeadsByTag = async (req, res) => {
     let selectedtags;
     // Check if tags are provided in the request body
-    if (req.query.tags && typeof req.query.tags === 'string') {
+    if (req.query.Tags && typeof req.query.Tags === 'string') {
         // Split the string by comma and trim extra whitespace
-        selectedtags = req.query.tags.split(',').map(tag => tag.trim());
-    } else if (Array.isArray(req.query.tags)) {
-        selectedtags = req.query.tags;
+        selectedtags = req.query.Tags.split(',').map(tag => tag.trim());
+    } else if (Array.isArray(req.query.Tags)) {
+        selectedtags = req.query.Tags;
     } else {
         return res.status(400).json({ message: "Tags parameter is required as a non-empty array or comma-separated string" });
     }
@@ -354,7 +354,7 @@ exports.getRemoteLeadsByTag = async (req, res) => {
         const regex = new RegExp(regexPattern, 'i');
 
         // Find leads that contain any of the selected tags
-        const remoteleads = await RemoteLeadData.find({ tags: { $regex: new RegExp(selectedtags.join('|'), 'i') } });
+        const remoteleads = await RemoteLeadData.find({ Tags: { $regex: new RegExp(selectedtags.join('|'), 'i') } });
 
         if (remoteleads.length === 0) {
             return res.status(404).json({ message: `No leads found for the tag(s) "${selectedtags.join(', ')}"` });
@@ -416,10 +416,10 @@ exports.getRemoteLeadsByPlatformAndTag = async (req, res) => {
     }
 
     // Parse tags from the request
-    if (req.body.tags) {
-        selectedTags = typeof req.body.tags === 'string' ? 
-                       req.body.tags.split(',').map(tag => tag.trim()) : 
-                       req.body.tags;
+    if (req.body.Tags) {
+        selectedTags = typeof req.body.Tags === 'string' ? 
+                       req.body.Tags.split(',').map(tag => tag.trim()) : 
+                       req.body.Tags;
     }
 
     // Check if at least one of the filters is provided
@@ -437,7 +437,7 @@ exports.getRemoteLeadsByPlatformAndTag = async (req, res) => {
         if (selectedTags.length > 0) {
             // Using case-insensitive search for tags, removing word boundaries for broader matching
             const regexPattern = selectedTags.map(tag => `${tag}`).join('|');
-            query.tags = { $regex: new RegExp(regexPattern, 'i') };
+            query.Tags = { $regex: new RegExp(regexPattern, 'i') };
         }
 
         // Find leads based on the constructed query
@@ -458,14 +458,14 @@ exports.getRemoteLeadsByPlatformAndTag = async (req, res) => {
 
 // search reference in only tags 
 
-exports.getSearchByTag = async (req, res) => {
+exports.getRemoteleadSearchByTag = async (req, res) => {
     let selectedtags;
     // Check if tags are provided in the request body
-    if (req.body.tags && typeof req.body.tags === 'string') {
+    if (req.body.Tags && typeof req.body.Tags === 'string') {
         // Split the string by comma and trim extra whitespace
-        selectedtags = req.body.tags.split(',').map(tag => tag.trim());
-    } else if (Array.isArray(req.body.tags)) {
-        selectedtags = req.body.tags;
+        selectedtags = req.body.Tags.split(',').map(tag => tag.trim());
+    } else if (Array.isArray(req.body.Tags)) {
+        selectedtags = req.body.Tags;
     } else {
         return res.status(400).json({ message: "Tags parameter is required as a non-empty array or comma-separated string" });
     }
@@ -480,7 +480,7 @@ exports.getSearchByTag = async (req, res) => {
         const regex = new RegExp(regexPattern, 'i');
 
         // Find leads that contain any tag matching the regex pattern
-        const remoteleads = await RemoteLeadData.find({ tags: { $regex: regex } });
+        const remoteleads = await RemoteLeadData.find({ Tags: { $regex: regex } });
         console.log(remoteleads)
         if (remoteleads.length === 0) {
             return res.status(404).json({ message: `No leads found for the provided tag(s)` });
@@ -497,11 +497,11 @@ exports.getSearchByTag = async (req, res) => {
         //     }
         //     return acc;
         // }, );
-        const tagsArray =  remoteleads.map(lead => lead.tags)
+        const tagsArray =  remoteleads.map(lead => lead.Tags)
         const tagsSplit = tagsArray.map(tags => tags.split('\n'));
 
         console.log(tagsSplit);
-        res.status(200).json({ tags:tagsSplit  });
+        res.status(200).json({ Tags:tagsSplit  });
 
     } catch (err) {
         console.error("Error fetching tags by query:", err);
@@ -545,36 +545,36 @@ exports.getSearchByTag = async (req, res) => {
 // };
 
 
-exports.getTechnology = async (req, res) => {
-    try {
-        // Get the technology from the query parameter or the request body and convert to lowercase
-        const technology = (req.query.Technology).toLowerCase();
+// exports.getTechnology = async (req, res) => {
+//     try {
+//         // Get the technology from the query parameter or the request body and convert to lowercase
+//         const technology = (req.query.Technology).toLowerCase();
 
-        if (!technology) {
-            return res.status(400).json({ message: "Technology parameter is required" });
-        }
+//         if (!technology) {
+//             return res.status(400).json({ message: "Technology parameter is required" });
+//         }
 
-        // Define an array of valid technologies
-        const validTechnologies = ["blockchain", "web", "app"];
+//         // Define an array of valid technologies
+//         const validTechnologies = ["blockchain", "web", "app"];
 
-        // Check if the provided technology is valid (case-insensitive)
-        if (!validTechnologies.includes(technology)) {
-            return res.status(400).json({ message: "Invalid technology provided" });
-        }
+//         // Check if the provided technology is valid (case-insensitive)
+//         if (!validTechnologies.includes(technology)) {
+//             return res.status(400).json({ message: "Invalid technology provided" });
+//         }
 
-        // Find leads matching any of the specified technologies (case-insensitive)
-        const remoteleads = await RemoteLeadData.find({ Technology: new RegExp(technology, 'i') });
+//         // Find leads matching any of the specified technologies (case-insensitive)
+//         const remoteleads = await RemoteLeadData.find({ Technology: new RegExp(technology, 'i') });
 
-        if (remoteleads.length === 0) {
-            return res.status(404).json({ message: `No leads found for the provided technology` });
-        }
+//         if (remoteleads.length === 0) {
+//             return res.status(404).json({ message: `No leads found for the provided technology` });
+//         }
 
-        res.status(200).json(remoteleads);
-    } catch (err) {
-        console.error("Error fetching leads by technology:", err);
-        res.status(500).json({ message: "An error occurred while fetching leads" });
-    }
-};
+//         res.status(200).json(remoteleads);
+//     } catch (err) {
+//         console.error("Error fetching leads by technology:", err);
+//         res.status(500).json({ message: "An error occurred while fetching leads" });
+//     }
+// };
 
 
 
