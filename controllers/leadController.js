@@ -40,6 +40,28 @@ exports.deleteLeadById = async (req, res) => {
     }
 };
 
+exports.updateLead = async (req, res) => {
+    try {
+        const leadId = req.params.id; // Assuming the lead ID is passed in the request parameters
+        const updatedData = req.body; // Updated lead data
+        
+        // Find the lead by ID and update its data
+        const leadData = await LeadData.findByIdAndUpdate(leadId, updatedData, { new: true });
+
+        // Check if the lead exists
+        if (!leadData) {
+            return res.status(404).json({ message: "Lead not found" });
+        }
+
+        // Respond with the updated lead data
+        res.status(200).json(leadData);
+    } catch (err) {
+        // Handle errors
+        res.status(400).json({ message: err.message });
+    }
+};
+
+
 
 
 // Fetch leads by tag

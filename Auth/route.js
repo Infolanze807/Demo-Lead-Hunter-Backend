@@ -22,6 +22,7 @@ router.get('/', leadController.getAllLeads);
 
 // DELETE /leads/:id - Delete a lead by ID
 router.delete('/:id', leadController.deleteLeadById);
+router.put('/:id', leadController.updateLead);
 // router.delete("/:id", adminAuth, leadController.deleteLeadById);
 
 // Route to fetch leads by tag
@@ -49,7 +50,8 @@ router.post('/remotelead', remoteleadController.createRemoteLead);
 router.get('/remotelead', remoteleadController.getAllRemoteLeads);
 
 // DELETE /remotelead/:id - Delete a remote lead by ID
-router.delete('/remotelead/:id', remoteleadController.deleteRemoteLeadById);
+router.delete('/:id', remoteleadController.deleteRemoteLeadById);
+router.put('/:id', remoteleadController.updateRemoteLead);
 
 // GET /remotelead/tag - Fetch remote leads by tag
 router.get('/remoteleadstag', remoteleadController.getRemoteLeadsByTag);
@@ -80,3 +82,6 @@ module.exports = router
 
 
 module.exports.userRouter = userRouter;
+
+
+

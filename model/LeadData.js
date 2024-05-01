@@ -9,7 +9,7 @@ const leadDataSchema = new Schema({
     level: { type: String, required: true },
     Technology: {type: String},
     duration: String,
-    budget: String,
+    project_budget: String,
     link: String
 }, { timestamps: true });
 

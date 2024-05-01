@@ -14,9 +14,10 @@ function generateTransactionID() {
 }
 
 async function newPayment(req, res) {
+
   try {
     const { name, phonenumber,password,email, amount } = req.body;
-    
+    console.log(req.body,"body")
     const data = {
       merchantId: "PGTESTPAYUAT",
       merchantTransactionId: generateTransactionID(),
@@ -28,7 +29,7 @@ async function newPayment(req, res) {
       email: email,
       mobileNumber: phonenumber,
       paymentInstrument: {
-        type: "PAY_PAGE",
+        type: "PAY_PAGE",   
       },
     };
 
