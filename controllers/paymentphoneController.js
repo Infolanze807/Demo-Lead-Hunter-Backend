@@ -21,7 +21,7 @@ async function newPayment(req, res) {
     const data = {
       merchantId: process.env.MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
-      // merchantUserId: "MUID2QWQEFW5Q6WSER7",
+      merchantUserId: "MUID2QWQEFW5Q6WSER7",
       merchantUserId: "MUID" + user_id,
       name: name,
       amount: amount * 100, // Convert amount to cents
@@ -63,7 +63,7 @@ async function newPayment(req, res) {
           const user_found = await User.findOne({ email });
           if (user_found) {
             if (user_found.payment_status === "SUCCESSFUL") {
-                return res.json({ status:false ,msg: "Account already exists" });
+                return res.json({ status:false,msg: "Account already exists" });
             }
             else if (user_found.payment_status === "PENDING") {
                 try {
@@ -131,7 +131,7 @@ async function newPayment(req, res) {
 //end code manish
 
 async function statusCheck(req, res) {
-  const merchantTransactionId = req.body.transaction_Id;
+  const merchantTransactionId = req.body.transactionId;
   const merchantId = process.env.MERCHANT_ID;
 
   const keyIndex = 1;
