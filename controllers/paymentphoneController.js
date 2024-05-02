@@ -22,7 +22,6 @@ async function newPayment(req, res) {
       merchantId: process.env.MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
       merchantUserId: "MUID2QWQEFW5Q6WSER7",
-      merchantUserId: "MUID" + user_id,
       name: name,
       amount: amount * 100, // Convert amount to cents
       redirectUrl: `${process.env.BASE_URL_BACKEND}/api/phonepe/status/${merchantTransactionId}`,
