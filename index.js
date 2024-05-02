@@ -8,17 +8,10 @@
     const { adminAuth, userAuth } = require("./middleware/auth");
     const phonepeRoute = require("./routes/phoneperoute");
     const { userRouter } = require("./Auth/route");
-    const {morgan} = require('morgan');
 
     const dotenv = require('dotenv');
 
     dotenv.config();
-
-    app,use(morgan("tiny"));
-    app.use((req,res,next) => {
-        res.setHeader("Permission-Policy", "payment=*")
-        next();
-    })
 
     const app = express(); // Initialize express app here
 
