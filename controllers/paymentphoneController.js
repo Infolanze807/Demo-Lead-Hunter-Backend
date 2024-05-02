@@ -63,7 +63,7 @@ async function newPayment(req, res) {
           const user_found = await User.findOne({ email });
           if (user_found) {
             if (user_found.payment_status === "SUCCESSFUL") {
-                return res.json({ status:false,msg: "Account already exists" });
+                return res.json({ status:false ,msg: "Account already exists" });
             }
             else if (user_found.payment_status === "PENDING") {
                 try {
