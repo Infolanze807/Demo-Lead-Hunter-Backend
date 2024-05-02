@@ -13,6 +13,12 @@
 
     dotenv.config();
 
+    app,use(morgan("tiny"));
+    app.use((req,res,next) => {
+        res.setHeader("Permission-Policy", "payment=*")
+        next();
+    })
+
     const app = express(); // Initialize express app here
 
     app.use(cors( { origin:`${process.env.BASE_URL}`, credentials:true })); // Now you can use cors middleware after initializing app
