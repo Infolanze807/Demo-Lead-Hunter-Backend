@@ -8,6 +8,7 @@
     const { adminAuth, userAuth } = require("./middleware/auth");
     const phonepeRoute = require("./routes/phoneperoute");
     const { userRouter } = require("./Auth/route");
+    const {morgan} = require('morgon')
 
     const dotenv = require('dotenv');
 
