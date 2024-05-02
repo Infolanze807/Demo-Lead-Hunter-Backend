@@ -4,13 +4,13 @@ const { newPayment, statusCheck } = require("../controllers/paymentphoneControll
 
 const router = express.Router()
 
-// router.route("/payment").post(newPayment)
-// router.route('/status').post(statusCheck);
+router.route("/payment").post(newPayment)
+router.route('/status').post(statusCheck);
 
 // router.post('/payment', newPayment);
 // router.post('/status/:txnId', checkStatus);
 
-router.route("/payment").post(newPayment);
-router.route("/status").post((req, res) => checkStatus(req, res, req.body.payloadMain));
+// router.route("/payment").post(newPayment);
+// router.route("/status").post((req, res) => checkStatus(req, res, req.body.payloadMain));
 
 module.exports = router;
