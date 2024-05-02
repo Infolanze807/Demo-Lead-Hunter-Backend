@@ -21,11 +21,11 @@ async function newPayment(req, res) {
     const data = {
       merchantId: process.env.MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
-      merchantUserId: "MUID2QWQEFW5Q6WSER7",
+      merchantUserId: "MUID" + email,
       name: name,
       amount: amount * 100, // Convert amount to cents
       redirectUrl: `${process.env.BASE_URL_BACKEND}/api/phonepe/status/${merchantTransactionId}`,
-      redirectMode: "POST",
+      redirectMode: "POST", 
       email: email,
       mobileNumber: phonenumber,
       paymentInstrument: {
@@ -130,7 +130,7 @@ async function newPayment(req, res) {
 //end code manish
 
 async function statusCheck(req, res) {
-  const merchantTransactionId = req.body.transaction_Id;
+  const merchantTransactionId = req.params["txnId"];
   const merchantId = process.env.MERCHANT_ID;
 
   const keyIndex = 1;
