@@ -21,7 +21,8 @@ async function newPayment(req, res) {
     const data = {
       merchantId: process.env.MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
-      merchantUserId: "MUID2QWQEFW5Q6WSER7",
+      // merchantUserId: "MUID2QWQEFW5Q6WSER7",
+      merchantUserId: "MUID" + user_id,
       name: name,
       amount: amount * 100, // Convert amount to cents
       redirectUrl: `${process.env.BASE_URL_BACKEND}/api/phonepe/status/${merchantTransactionId}`,
@@ -130,7 +131,7 @@ async function newPayment(req, res) {
 //end code manish
 
 async function statusCheck(req, res) {
-  const merchantTransactionId = req.body.transactionId;
+  const merchantTransactionId = req.body.transaction_Id;
   const merchantId = process.env.MERCHANT_ID;
 
   const keyIndex = 1;
