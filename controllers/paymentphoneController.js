@@ -130,7 +130,7 @@ async function newPayment(req, res) {
 //end code manish
 
 async function statusCheck(req, res) {
-  const merchantTransactionId = req.body.transactionId;
+  const merchantTransactionId = req.body.transaction_Id;
   const merchantId = process.env.MERCHANT_ID;
 
   const keyIndex = 1;
