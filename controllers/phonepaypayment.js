@@ -1,25 +1,18 @@
 const crypto = require('crypto');
 const axios = require('axios');
 require("dotenv").config();
-function generateTransactionID() {
-    const timestamp = Date.now();
-    const randomNum = Math.floor(Math.random() * 1000000);
-    const merchantPrefix = "T";
-    const transactionID = `${merchantPrefix}${timestamp}${randomNum}`;
-    return transactionID;
-  }
+
 const newPayment = async (req, res) => {
  try {
- const merchantTransactionId = generateTransactionID();
- console.log(merchantTransactionId)
+ const merchantTransactionId = 'M' + Date.now();
  const {user_id, price, phone, name} = req.body;
  const data = {
- merchantId: "PGTESTPAYUAT",
+ merchantId: process.env.MERCHANT_ID,
  merchantTransactionId: merchantTransactionId,
- merchantUserId: 'MUID2QWQEFW5Q6WSER7',
+ merchantUserId: 'MUID' + user_id,
  name: name,
  amount: price * 100,
- redirectUrl: `${process.env.BASE_URL}/api/phonepe/status/${merchantTransactionId}`,
+ redirectUrl: `http://localhost:5000/api/phonepe/status/${merchantTransactionId}`,
  redirectMode: 'POST',
  mobileNumber: phone,
  paymentInstrument: {
@@ -28,12 +21,11 @@ const newPayment = async (req, res) => {
  };
  const payload = JSON.stringify(data);
  const payloadMain = Buffer.from(payload).toString('base64');
- const keyIndex = 2;
- const string = payloadMain + "/pg/v1/pay" + "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
+ const keyIndex = 1;
+ const string = payloadMain + '/pg/v1/pay' + process.env.SALT_KEY;
  const sha256 = crypto.createHash('sha256').update(string).digest('hex');
  const checksum = sha256 + '###' + keyIndex;
-// const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
-const prod_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
+const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
  const options = {
  method: 'POST',
  url: prod_URL,
@@ -47,7 +39,7 @@ const prod_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
  }
  };
 axios.request(options).then(function (response) {
- return res.redirect(response.data)
+ return res.send({"url":response.data.data.instrumentResponse.redirectInfo.url})
  })
  .catch(function (error) {
  console.error(error);
@@ -60,16 +52,15 @@ axios.request(options).then(function (response) {
  }
 }
 const checkStatus = async(req, res) => {
-    const merchantTransactionId = res.req.body.transactionId;
-    const merchantId = res.req.body.merchantId;
+ const merchantTransactionId = req.params['txnId']
+ const merchantId = process.env.MERCHANT_ID
  const keyIndex = 1;
- //const string = `/pg/v1/status/${merchantId}/${merchantTransactionId}` + process.env.SALT_KEY;
- const string = payloadMain + "/pg/v1/pay" + "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
+ const string = `/pg/v1/status/${merchantId}/${merchantTransactionId}` + process.env.SALT_KEY;
  const sha256 = crypto.createHash('sha256').update(string).digest('hex');
  const checksum = sha256 + "###" + keyIndex;
 const options = {
  method: 'GET',
- url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${merchantId}/${merchantTransactionId}`,
+ url: `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchantId}/${merchantTransactionId}`,
  headers: {
  accept: 'application/json',
  'Content-Type': 'application/json',
@@ -94,4 +85,4 @@ const options = {
 module.exports = {
  newPayment,
  checkStatus
-}   
+}

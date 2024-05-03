@@ -5,25 +5,26 @@ const { createNewUser } = require("../Auth/register.js");
 const bcrypt = require("bcryptjs");
 // const bcrypt = require("bcrypt");
 
-function generateTransactionID() {
-  const timestamp = Date.now();
-  const randomNum = Math.floor(Math.random() * 1000000);
-  const merchantPrefix = "T";
-  const transactionID = `${merchantPrefix}${timestamp}${randomNum}`;
-  return transactionID;
-}
+// function generateTransactionID() {
+//   const timestamp = Date.now();
+//   const randomNum = Math.floor(Math.random() * 1000000);
+//   const merchantPrefix = "T";
+//   const transactionID = `${merchantPrefix}${timestamp}${randomNum}`;
+//   return transactionID;
+// }
 
 async function newPayment(req, res) {
   try {
-    const { name, phonenumber,password,email, amount } = req.body;
-    
+    const merchantTransactionId = "M" + Date.now();
+    const { name, phonenumber, password, email, amount } = req.body;
+    console.log(req.body, "body")
     const data = {
-      merchantId: "PGTESTPAYUAT",
-      merchantTransactionId: generateTransactionID(),
+      merchantId: process.env.MERCHANT_ID,
+      merchantTransactionId: merchantTransactionId,
       merchantUserId: "MUID2QWQEFW5Q6WSER7",
       name: name,
       amount: amount * 100, // Convert amount to cents
-      redirectUrl: `${process.env.BASE_URL}/api/phonepe/status/`,
+      redirectUrl: `${process.env.BASE_URL_BACKEND}/api/phonepe/status/${merchantTransactionId}`,
       redirectMode: "POST",
       email: email,
       mobileNumber: phonenumber,
@@ -36,11 +37,11 @@ async function newPayment(req, res) {
     const payloadMain = Buffer.from(payload).toString("base64");
     const keyIndex = 1;
     const string =
-      payloadMain + "/pg/v1/pay" + "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
+      payloadMain + "/pg/v1/pay" + process.env.SALT_KEY;
     const sha256 = crypto.createHash("sha256").update(string).digest("hex");
     const checksum = sha256 + "###" + keyIndex;
 
-    const URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
+    const URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
     const options = {
       method: "POST",
       url: URL,
@@ -129,20 +130,18 @@ async function newPayment(req, res) {
 //end code manish
 
 async function statusCheck(req, res) {
-  const merchantTransactionId = res.req.body.transactionId;
-  const merchantId = res.req.body.merchantId;
+  const merchantTransactionId = req.body.transactionId;
+  const merchantId = process.env.MERCHANT_ID;
 
   const keyIndex = 1;
-  const string =
-    `/pg/v1/status/${merchantId}/${merchantTransactionId}` +
-    "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-  // const string = `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${merchantId}/${merchantTransactionId}`;
+  const string = `/pg/v1/status/${merchantId}/${merchantTransactionId}` + process.env.SALT_KEY;
+
   const sha256 = crypto.createHash("sha256").update(string).digest("hex");
   const checksum = sha256 + "###" + keyIndex;
 
   const options = {
     method: "GET",
-    url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${merchantId}/${merchantTransactionId}`,
+    url: `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchantId}/${merchantTransactionId}`,
     headers: {
       accept: "application/json",
       "Content-Type": "application/json",
@@ -155,7 +154,6 @@ async function statusCheck(req, res) {
   axios
     .request(options)
     .then(async (response) => {
-  
       if (response.data.success === true) {
         const transaction_id = response.data.data.merchantTransactionId;
         const req_data = await User.findOne({ transaction_id });
@@ -164,21 +162,19 @@ async function statusCheck(req, res) {
 
         await req_data.save();
 
-        // const url = `https://lead-hunter-olive.vercel.app/pay-success/${transaction_id}`;
         const url = `${process.env.BASE_URL}/pay-success/${transaction_id}`;
         return res.redirect(url);
       } else {
-        // const url = `https://lead-hunter-olive.vercel.app/register?status=failed`;
         const url = `${process.env.BASE_URL}/register?status=failed`;
         return res.redirect(url);
-      } 
+      }
     })
-    .catch((error) => { 
+    .catch((error) => {
       console.error("An error occurred:", error);
-      // const url = `https://lead-hunter-olive.vercel.app/register?status=failed`;
       const url = `${process.env.BASE_URL}/register?status=failed`;
       return res.redirect(url);
     });
 };
+
 
 module.exports = { newPayment, statusCheck };
