@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const remoteleadController = require("../controllers/remoteleadController");
 
-// const userRouter = require("express").Router();
-
 // POST /remotelead - Create a new remote lead
 router.post('/remotelead', remoteleadController.createRemoteLead);
 
@@ -25,9 +23,6 @@ router.get('/remotelead/platform', remoteleadController.getRemoteLeadsByPlatform
 
 // GET /remotelead/search - Search remote leads by tag
 router.get('/remotelead/search', remoteleadController.getRemoteLeadSearchByTag);
-
-// GET /remoteleads/technology - Get remote leads by technology
-// router.get('remotelead/technology', leadController.getRemoteLeadsByTechnology);
 
 
 module.exports = router
