@@ -159,11 +159,11 @@ async function statusCheck(req, res) {
   axios
     .request(options)
     .then(async (response) => {
-      if (response.data.success === true) {
+      if (response.data.data.responseCode === "SUCCESS") {
         const transaction_id = response.data.data.merchantTransactionId;
         const req_data = await User.findOne({ transaction_id });
 
-        console.log('response new', response.data);
+        console.log('response new', response.data.data);
 
         console.log("merchant new IDdddddddd:", transaction_id);
         console.log("merchant new data:", req_data);
