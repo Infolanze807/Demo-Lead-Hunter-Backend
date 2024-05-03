@@ -4,6 +4,7 @@
     const cors = require('cors');
     const bcrypt = require('bcrypt');
     const routes = require("./Auth/route");
+    const remoteLeadRoute = require("./routes/remoteLeadRoute")
     const passwordReset = require("./Auth/passwordReset");
     const { adminAuth, userAuth } = require("./middleware/auth");
     const phonepeRoute = require("./routes/phoneperoute");
@@ -45,7 +46,7 @@ app.get("/logout", (req, res) => {
     app.get("/api/basic", userAuth, (req, res) => res.send("User Route"));
 
     app.use('/api/leads', routes);
-    app.use('/api/remoteleads', routes);
+    app.use('/api/remoteleads', remoteLeadRoute);
     // app.use("/api/leads", userAuth, routes);
 
     app.use("/api/v1", userRouter);
