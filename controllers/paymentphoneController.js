@@ -130,7 +130,10 @@ async function newPayment(req, res) {
 //end code manish
 
 async function statusCheck(req, res) {
-  const merchantTransactionId = req.body.transactionId;
+  const merchantTransactionId = req.params["txnId"];
+
+  console.log("Transaction ID:", merchantTransactionId);
+
   const merchantId = process.env.MERCHANT_ID;
 
   const keyIndex = 1;
@@ -158,23 +161,31 @@ async function statusCheck(req, res) {
         const transaction_id = response.data.data.merchantTransactionId;
         const req_data = await User.findOne({ transaction_id });
 
-        req_data.payment_status = "SUCCESSFUL";
-
-        await req_data.save();
-
-        const url = `${process.env.BASE_URL}/pay-success/${transaction_id}`;
-        return res.redirect(url);
+        if (req_data) {
+          // If user is found, update payment status to SUCCESSFUL
+          req_data.payment_status = "SUCCESSFUL";
+          await req_data.save(); // Save the updated user data
+          const url = `${process.env.BASE_URL}/pay-success/${transaction_id}`;
+          return res.redirect(url);
+        } else {
+          // If user is not found, redirect to a failed payment URL
+          const url = `${process.env.BASE_URL}/register?status=failed`;
+          return res.redirect(url);
+        }
       } else {
+        // If payment status check fails, redirect to a failed payment URL
         const url = `${process.env.BASE_URL}/register?status=failed`;
         return res.redirect(url);
       }
     })
     .catch((error) => {
       console.error("An error occurred:", error);
+      // If an error occurs during payment status check, redirect to a failed payment URL
       const url = `${process.env.BASE_URL}/register?status=failed`;
       return res.redirect(url);
     });
-};
+}
+
 
 
 module.exports = { newPayment, statusCheck };

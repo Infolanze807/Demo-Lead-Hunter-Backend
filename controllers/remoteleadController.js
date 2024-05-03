@@ -35,6 +35,27 @@ exports.deleteRemoteLeadById = async (req, res) => {
     }
 };
 
+exports.updateRemoteLead = async (req, res) => {
+    try {
+        const leadId = req.params.id; // Assuming the lead ID is passed in the request parameters
+        const updatedData = req.body; // Updated lead data
+        
+        // Find the remote lead by ID and update its data
+        const remoteLead = await RemoteLeadData.findByIdAndUpdate(leadId, updatedData, { new: true });
+
+        // Check if the remote lead exists
+        if (!remoteLead) {
+            return res.status(404).json({ message: "Remote lead not found" });
+        }
+
+        // Respond with the updated remote lead data
+        res.status(200).json(remoteLead);
+    } catch (err) {
+        // Handle errors
+        res.status(400).json({ message: err.message });
+    }
+};
+
 // Fetch remote leads by tag
 exports.getRemoteLeadsByTag = async (req, res) => {
     let selectedtags;

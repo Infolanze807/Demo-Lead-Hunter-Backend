@@ -23,7 +23,7 @@
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
 
-    app.get("/", (req, res) => res.render("home"));
+    app.get("/", (req, res) => res.send("home"));
 
 app.get("/logout", (req, res) => {
     res.cookie("jwt", "", { maxAge: "0" });
