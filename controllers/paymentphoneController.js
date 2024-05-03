@@ -24,7 +24,7 @@ async function newPayment(req, res) {
       merchantUserId: "MUID2QWQEFW5Q6WSER7",
       name: name,
       amount: amount * 100, // Convert amount to cents
-      redirectUrl: `${process.env.BASE_URL_BACKEND}/api/phonepe/status/${merchantTransactionId}`,
+      redirectUrl: `https://demo-lead-hunter-backend.vercel.app/api/phonepe/status/${merchantTransactionId}`,
       redirectMode: "POST",
       email: email,
       mobileNumber: phonenumber,
@@ -130,8 +130,13 @@ async function newPayment(req, res) {
 //end code manish
 
 async function statusCheck(req, res) {
-  const merchantTransactionId = req.body.transactionId;
+  const merchantTransactionId = req.params["txnId"];
+
+  console.log("Transaction IDddddddd:", merchantTransactionId);
+
   const merchantId = process.env.MERCHANT_ID;
+
+  console.log("merchant IDdddddddd:", merchantId);
 
   const keyIndex = 1;
   const string = `/pg/v1/status/${merchantId}/${merchantTransactionId}` + process.env.SALT_KEY;
@@ -154,27 +159,40 @@ async function statusCheck(req, res) {
   axios
     .request(options)
     .then(async (response) => {
-      if (response.data.success === true) {
+      if (response.data.data.responseCode === "SUCCESS") {
         const transaction_id = response.data.data.merchantTransactionId;
         const req_data = await User.findOne({ transaction_id });
 
-        req_data.payment_status = "SUCCESSFUL";
+        console.log('response new', response.data.data);
 
-        await req_data.save();
+        console.log("merchant new IDdddddddd:", transaction_id);
+        console.log("merchant new data:", req_data);
 
-        const url = `${process.env.BASE_URL}/pay-success/${transaction_id}`;
-        return res.redirect(url);
+        if (req_data) {
+          // If user is found, update payment status to SUCCESSFUL
+          req_data.payment_status = "SUCCESSFUL";
+          await req_data.save(); // Save the updated user data
+          const url = `https://www.leadhunter.co.in/pay-success/${transaction_id}`;
+          return res.redirect(url);
+        } else {
+          // If user is not found, redirect to a failed payment URL
+          const url = `https://www.leadhunter.co.in/register?status=failed`;
+          return res.redirect(url);
+        }
       } else {
-        const url = `${process.env.BASE_URL}/register?status=failed`;
+        // If payment status check fails, redirect to a failed payment URL
+        const url = `https://www.leadhunter.co.in/register?status=failed`;
         return res.redirect(url);
       }
     })
     .catch((error) => {
       console.error("An error occurred:", error);
-      const url = `${process.env.BASE_URL}/register?status=failed`;
+      // If an error occurs during payment status check, redirect to a failed payment URL
+      const url = `https://www.leadhunter.co.in/register?status=failed`;
       return res.redirect(url);
     });
-};
+}
+
 
 
 module.exports = { newPayment, statusCheck };
