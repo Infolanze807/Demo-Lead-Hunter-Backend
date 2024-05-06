@@ -3,15 +3,6 @@ const axios = require("axios");
 const User = require("../model/User");
 const { createNewUser } = require("../Auth/register.js");
 const bcrypt = require("bcryptjs");
-// const bcrypt = require("bcrypt");
-
-// function generateTransactionID() {
-//   const timestamp = Date.now();
-//   const randomNum = Math.floor(Math.random() * 1000000);
-//   const merchantPrefix = "T";
-//   const transactionID = `${merchantPrefix}${timestamp}${randomNum}`;
-//   return transactionID;
-// }
 
 async function newPayment(req, res) {
   try {
@@ -62,7 +53,7 @@ async function newPayment(req, res) {
           const user_found = await User.findOne({ email });
           if (user_found) {
             if (user_found.payment_status === "SUCCESSFUL") {
-                return res.json({ status:false,msg: "Account already exists" });
+                return res.json({ status:false, message: "USER ALREADY EXIEST" });
             }
             else if (user_found.payment_status === "PENDING") {
                 try {
@@ -111,12 +102,12 @@ async function newPayment(req, res) {
            }
         } catch (error) {
           console.log("Error querying user:", error);
-          res.status(500).json({ error: "Internal server error" });
+          res.status(500).json({ error: "ERROR CREATING USER" });
         }
       })
       .catch(function (error) {
         console.error("Error making payment request:", error);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ error: "SIGNUP FAILED" });
       });
   } catch (error) {
     console.error("Error processing payment request:", error);
@@ -175,18 +166,18 @@ async function statusCheck(req, res) {
         return res.redirect(url);
       } else {
         // If user is not found, redirect to a failed payment URL
-        const url = `https://www.leadhunter.co.in/register?status=failed`;
+        const url = `https://www.leadhunter.co.in/register/status=failed`;
         return res.redirect(url);
       }
     } else {
       // If payment status check fails, redirect to a failed payment URL
-      const url = `https://www.leadhunter.co.in/register?status=failed`;
+      const url = `https://www.leadhunter.co.in/register/status=failed`;
       return res.redirect(url);
     }
   } catch (error) {
     console.error("An error occurred:", error);
     // If an error occurs during payment status check, redirect to a failed payment URL
-    const url = `https://www.leadhunter.co.in/register?status=failed`;
+    const url = `https://www.leadhunter.co.in/register/status=failed`;
     return res.redirect(url);
   }
 }
