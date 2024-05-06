@@ -18,7 +18,7 @@ async function login(req, res) {
 
     // Check if user exists
     if (!user) {
-      return res.status(400).json({user:false, message: "USER NOT EXIST" });
+      return res.status(400).json({user:false, message: "USER DOES NOT EXIST" });
     }
 
     // Compare passwords

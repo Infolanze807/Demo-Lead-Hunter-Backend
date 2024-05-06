@@ -17,15 +17,15 @@ router.post("/", async (req, res) => {
     try {
         const schema = Joi.object({ email: Joi.string().email().required() });
         const { error } = schema.validate(req.body);
-        if (error) return res.status(400).send(error.details[0].message);
+        if (error) return res.status(400).json(error.details[0].message);
 
         const user = await User.findOne({ email });
         if (!user)
-            return res.status(400).send("User with given email doesn't exist");
+            return res.status(400).json({message:"User with given email doesn't exist"});
 
         // Check if it's been at least one minute since the last password reset request
         if (lastResetRequest[user._id] && Date.now() - lastResetRequest[user._id] < 60000) {
-            return res.status(400).send("Please wait at least one minute before requesting another password reset");
+            return res.status(400).json({message:"Please wait at least one minute before requesting another password reset"});
         }
 
         let token = await Token.findOne({ userId: user._id });
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
             // Schedule the task to delete the old token after one minute
             setTimeout(async () => {
                 await Token.deleteOne({ userId: user._id });
-                console.log("Old token deleted.");
+                console.log({message:"Old token deleted."});
             }, 60000);
         }
 
@@ -53,7 +53,7 @@ router.post("/", async (req, res) => {
 
         res.send(link);
     } catch (error) {
-        res.send("An error occurred");
+        res.json({message:"An error occurred"});
         console.log(error);
     }
 });
@@ -63,16 +63,16 @@ router.post("/:userId/:token", async (req, res) => {
     try {
         const schema = Joi.object({ password: Joi.string().required() });
         const { error } = schema.validate(req.body);
-        if (error) return res.status(400).send(error.details[0].message);
+        if (error) return res.status(400).json(error.details[0].message);
 
         const user = await User.findById(req.params.userId);
-        if (!user) return res.status(400).send("Invalid link or expired");
+        if (!user) return res.status(400).json({message:"Invalid link or expired"});
 
         const token = await Token.findOne({
             userId: user._id,
             token: req.params.token,
         });
-        if (!token) return res.status(400).send("Invalid link or expired");
+        if (!token) return res.status(400).json({message:"Invalid link or expired"});
 
         // Hash the new password
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -83,9 +83,9 @@ router.post("/:userId/:token", async (req, res) => {
         // Delete the token
         await token.deleteOne();
 
-        res.send("Password reset successfully.");
+        res.json({message:"Password reset successfully."});
     } catch (error) {
-        res.send("An error occurred");
+        res.json({message:"An error occurred"});
         console.log(error);
     }
 });
@@ -112,7 +112,7 @@ router.get("/:userId/:token", async (req, res) => {
         res.json({ status: true, message: "Valid link" });
 
     } catch (error) {
-        res.status(500).send("An error occurred");
+        res.status(500).json({message:"An error occurred"});
         console.error(error);
     }
 });
