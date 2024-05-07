@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user)
-            return res.status(400).json({message:"User with given email doesn't exist"});
+            return res.status(400).json({message:"User with given email doesn't Exist"});
 
         // Check if it's been at least one minute since the last password reset request
         if (lastResetRequest[user._id] && Date.now() - lastResetRequest[user._id] < 60000) {
