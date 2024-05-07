@@ -26,10 +26,10 @@ const UserSchema = new Mongoose.Schema({
   phonenumber: {
     type: String,
    // unique: true,
-    minlength: 10,
-    maxlength: 10,
+    minlength: 8,
+    maxlength: 12,
     // Regular expression for Indian phone number validation
-    match: /^[6-9]\d{9}$/,
+    match: /^[0-9]\d{9}$/,
     required: [true,"Phonenumber is required"],
   },
   role: {
