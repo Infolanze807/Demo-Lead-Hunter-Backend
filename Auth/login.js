@@ -4,15 +4,6 @@ const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Function to generate a unique transaction ID
-// function generateTransactionID() {
-//   const timestamp = Date.now();
-//   const randomNum = Math.floor(Math.random() * 1000000);
-//   const merchantPrefix = "T";
-//   const transactionID = `${merchantPrefix}${timestamp}${randomNum}`;
-//   return transactionID;
-// }
-
 async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -27,14 +18,14 @@ async function login(req, res) {
 
     // Check if user exists
     if (!user) {
-      return res.status(400).json({user:false, message: "User not found" });
+      return res.status(400).json({user:false, message: "USER DOES NOT EXIST" });
     }
 
     // Compare passwords
     const result = await bcrypt.compare(password, user.password);
 
     if (!result) {
-      return res.status(400).json({ user:false,message: "Incorrect password" });
+      return res.status(400).json({ user:false,message: "INCORRECT PASSWORD" });
     }
 
     // Check payment status
@@ -55,7 +46,7 @@ async function login(req, res) {
 
       // Send success response
       return res.status(200).json({
-        message: "User successfully logged in",
+        message: "LOGIN SUCCESSFUL",
         user: true,
         _id: user._id,
         email: user.email,
@@ -64,14 +55,14 @@ async function login(req, res) {
         token: token
       });
     } else if (user.payment_status === "PENDING") {
-        return res.json({payment_status:"PENDING", message:"PLEASE SIGN UP AGAIN AND COMPLETE PAYMENT"})
+        return res.status(400).json({user:false , payment_status:"PENDING", message:"PLEASE SIGN UP AGAIN AND COMPLETE PAYMENT"})
     } else {
       // Handle other payment statuses
-      return res.status(400).json({ message: "Login not successful" });
+      return res.status(400).json({user:false, message: "LOGIN NOT SUCCESSFUL" });
     }
   } catch (error) {
     console.error("An error occurred:", error);
-    return res.status(500).json({ message: "An error occurred" });
+    return res.status(500).json({message: "An error occurred" });
   }
 }
 
